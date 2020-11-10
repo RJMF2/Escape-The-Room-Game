@@ -1,0 +1,10 @@
+{
+	"files.exclude": {
+		"D:/Projects/unreal/EscapeGame/.vs": true,
+		"D:/Projects/unreal/EscapeGame/.vscode": true,
+		"D:/Projects/unreal/EscapeGame/Content": true,
+		"D:/Projects/unreal/EscapeGame/DerivedDataCache": true,
+		"D:/Projects/unreal/EscapeGame/Intermediate": true,
+		"D:/Projects/unreal/EscapeGame/Saved": true
+	}
+}
