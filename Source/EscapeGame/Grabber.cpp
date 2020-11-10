@@ -25,7 +25,6 @@ void UGrabber::BeginPlay()
 	inputComponent = GetOwner()->FindComponentByClass<UInputComponent>();
 	if (inputComponent)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("it exsists!"));
 		inputComponent->BindAction("Grab", IE_Pressed, this, &UGrabber::Grab);
 		inputComponent->BindAction("Grab", IE_Released, this, &UGrabber::GrabUnloked);
 	}
@@ -37,18 +36,35 @@ void UGrabber::BeginPlay()
 
 void UGrabber::Grab()
 {
-	AActor *hitActor = GetHitObject().GetActor();
-	if (hitActor)
-		UE_LOG(LogTemp, Warning, TEXT("you Grabing: %s"), *(hitActor->GetName()));
+	FHitResult hitRes = GetHitObject();
+	FVector lineTraceEnd = GetLineTraceEnd();
+	UPrimitiveComponent *componentToGrab = hitRes.GetComponent();
+
+	if (hitRes.GetActor())
+	{
+		physicsHandle->GrabComponentAtLocation(
+			componentToGrab,
+			NAME_None,
+			GetLineTraceEnd());
+	}
 }
 void UGrabber::GrabUnloked()
 {
-	UE_LOG(LogTemp, Warning, TEXT("the grable has released"));
+	if (physicsHandle->GrabbedComponent)
+	{
+		physicsHandle->ReleaseComponent();
+	}
 }
 
 void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
+	FVector lineTraceEnd = GetLineTraceEnd();
+	if (physicsHandle->GrabbedComponent)
+	{
+		physicsHandle->SetTargetLocation(lineTraceEnd);
+	}
 }
 
 FHitResult UGrabber::GetHitObject()
@@ -85,3 +101,4 @@ void UGrabber::GetPlayerViewPoint(FVector &playerLocation, FRotator &playerRotat
 		OUT playerLocation,
 		OUT playerRotation);
 }
+

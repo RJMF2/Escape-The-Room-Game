@@ -39,4 +39,8 @@ private:
 	UPROPERTY(EditAnywhere)
 	float doorClosedDelay = 2.f;
 	float currentWorldTime;
+	UPROPERTY(EditAnywhere)
+	float doorRequierdMass = 50.f;
+	float totalActorsMass;
+	float TotalMassOfActors();
 };

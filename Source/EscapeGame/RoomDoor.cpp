@@ -1,7 +1,10 @@
 #include "RoomDoor.h"
+#include "Components/PrimitiveComponent.h"
 #include "Engine/World.h"
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/Actor.h"
+
+#define OUT
 
 URoomDoor::URoomDoor()
 {
@@ -28,7 +31,7 @@ void URoomDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 
 	currentWorldTime = GetWorld()->GetTimeSeconds();
 
-	if (doorPlate && doorPlate->IsOverlappingActor(doorOpensPawn))
+	if (TotalMassOfActors() >= doorRequierdMass)
 	{
 		doorLastOpend = currentWorldTime;
 		DoorMecanic(DeltaTime, targetRotationYaw);
@@ -46,4 +49,16 @@ void URoomDoor::DoorMecanic(float DeltaTime, float rotateTo)
 	FRotator doorRotation(0.f, currentRotationYaw, 0.f);
 	doorRotation.Yaw = currentRotationYaw;
 	GetOwner()->SetActorRotation(doorRotation);
+}
+float URoomDoor::TotalMassOfActors()
+{
+	totalActorsMass = 0.f;
+	TArray<AActor *> overlappingActors;
+	doorPlate->GetOverlappingActors(OUT overlappingActors);
+	for (AActor *actor : overlappingActors)
+	{
+		totalActorsMass += actor->FindComponentByClass<UPrimitiveComponent>()->GetMass();
+	}
+
+	return totalActorsMass;
 }
