@@ -32,4 +32,7 @@ private:
 
 	void Grab();
 	void GrabUnloked();
+	FHitResult GetHitObject();
+	FVector GetLineTraceEnd();
+	void GetPlayerViewPoint(FVector &playerLocation, FRotator &playerRotation);
 };

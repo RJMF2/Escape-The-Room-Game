@@ -1,8 +1,7 @@
-#include "Grabber.h"
-
 #include "DrawDebugHelpers.h"
 #include "Engine/World.h"
 #include "GameFramework/PlayerController.h"
+#include "Grabber.h"
 
 #define OUT
 
@@ -22,6 +21,7 @@ void UGrabber::BeginPlay()
 	{
 		UE_LOG(LogTemp, Error, TEXT("please provide the missing component in %s!"), *GetOwner()->GetName());
 	}
+
 	inputComponent = GetOwner()->FindComponentByClass<UInputComponent>();
 	if (inputComponent)
 	{
@@ -37,7 +37,9 @@ void UGrabber::BeginPlay()
 
 void UGrabber::Grab()
 {
-	UE_LOG(LogTemp, Warning, TEXT("you grabed this"));
+	AActor *hitActor = GetHitObject().GetActor();
+	if (hitActor)
+		UE_LOG(LogTemp, Warning, TEXT("you Grabing: %s"), *(hitActor->GetName()));
 }
 void UGrabber::GrabUnloked()
 {
@@ -47,28 +49,17 @@ void UGrabber::GrabUnloked()
 void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-	FVector playerLocation;
-	FRotator playerRotation;
+}
 
-	GetWorld()->GetFirstPlayerController()->GetPlayerViewPoint(
-		OUT playerLocation,
-		OUT playerRotation);
-
-	// FVector lineDiriction = playerRotation.RotateVector(FVector(100.f, 0.f, 0.f));
-
-	FVector lineTraceEnd = playerLocation + playerRotation.Vector() * reach;
-	DrawDebugLine(
-		GetWorld(),
-		playerLocation,
-		lineTraceEnd,
-		FColor(0.f, 0.f, 255.f),
-		false,
-		0.f,
-		0,
-		5.f);
+FHitResult UGrabber::GetHitObject()
+{
+	FVector lineTraceEnd = GetLineTraceEnd();
 
 	FCollisionQueryParams traceParams(FName(TEXT("")), false, GetOwner());
 	FHitResult hitRes;
+	FVector playerLocation;
+	FRotator playerRotation;
+	GetPlayerViewPoint(OUT playerLocation, OUT playerRotation);
 	GetWorld()->LineTraceSingleByObjectType(
 		OUT hitRes,
 		playerLocation,
@@ -76,9 +67,21 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 		FCollisionObjectQueryParams(ECollisionChannel::ECC_PhysicsBody),
 		traceParams);
 
-	AActor *actorHit = hitRes.GetActor();
-	if (actorHit)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("this is %s"), *(actorHit->GetName()));
-	}
+	return hitRes;
+}
+
+FVector UGrabber::GetLineTraceEnd()
+{
+	// FVector lineDiriction = playerRotation.RotateVector(FVector(100.f, 0.f, 0.f));
+	FVector playerLocation;
+	FRotator playerRotation;
+	GetPlayerViewPoint(OUT playerLocation, OUT playerRotation);
+	FVector lineTraceEnd = playerLocation + playerRotation.Vector() * reach;
+	return lineTraceEnd;
+}
+void UGrabber::GetPlayerViewPoint(FVector &playerLocation, FRotator &playerRotation)
+{
+	GetWorld()->GetFirstPlayerController()->GetPlayerViewPoint(
+		OUT playerLocation,
+		OUT playerRotation);
 }
