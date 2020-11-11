@@ -52,6 +52,8 @@ void URoomDoor::DoorMecanic(float DeltaTime, float rotateTo)
 }
 float URoomDoor::TotalMassOfActors()
 {
+	if (!doorPlate)
+		return 0.f;
 	totalActorsMass = 0.f;
 	TArray<AActor *> overlappingActors;
 	doorPlate->GetOverlappingActors(OUT overlappingActors);

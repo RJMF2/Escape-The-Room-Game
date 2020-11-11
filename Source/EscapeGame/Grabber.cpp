@@ -19,6 +19,8 @@ void UGrabber::BeginPlay()
 
 void UGrabber::UserInputActions()
 {
+	if (!physicsHandle)
+		return;
 	inputComponent = GetOwner()->FindComponentByClass<UInputComponent>();
 	inputComponent->BindAction("Grab", IE_Pressed, this, &UGrabber::Grab);
 	inputComponent->BindAction("Grab", IE_Released, this, &UGrabber::GrabUnloked);
@@ -61,6 +63,8 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	FVector lineTraceEnd = GetLineTraceEnd();
+	if (!physicsHandle)
+		return;
 	if (physicsHandle->GrabbedComponent)
 	{
 		physicsHandle->SetTargetLocation(lineTraceEnd);
