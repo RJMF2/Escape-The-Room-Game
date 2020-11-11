@@ -16,16 +16,19 @@ public:
 	// Sets default values for this component's properties
 	URoomDoor();
 
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction) override;
+	void DoorMecanic(float DeltaTime, float rotateTo);
+
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
-public:
-	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction) override;
-	void DoorMecanic(float DeltaTime, float rotateTo);
-
 private:
+	//methods
+	float TotalMassOfActors();
+	void GetAudioComponent();
+
+	//variables
 	float initialYaw;
 	UPROPERTY(EditAnywhere)
 	float targetRotationYaw = 90.f;
@@ -42,5 +45,7 @@ private:
 	UPROPERTY(EditAnywhere)
 	float doorRequierdMass = 50.f;
 	float totalActorsMass;
-	float TotalMassOfActors();
+	UPROPERTY(EditAnyWhere)
+	UAudioComponent *audioComponent;
+	bool isDoorOpen = false;
 };

@@ -1,4 +1,5 @@
 #include "RoomDoor.h"
+#include "Components/AudioComponent.h"
 #include "Components/PrimitiveComponent.h"
 #include "Engine/World.h"
 #include "GameFramework/PlayerController.h"
@@ -22,7 +23,7 @@ void URoomDoor::BeginPlay()
 	{
 		UE_LOG(LogTemp, Error, TEXT("%s is trying to access the door plate and it's not assigned in the engine"), *GetOwner()->GetName());
 	}
-	doorOpensPawn = GetWorld()->GetFirstPlayerController()->GetPawn();
+	GetAudioComponent();
 }
 
 void URoomDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction)
@@ -34,12 +35,28 @@ void URoomDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 	if (TotalMassOfActors() >= doorRequierdMass)
 	{
 		doorLastOpend = currentWorldTime;
+		if (!audioComponent)
+			return;
 		DoorMecanic(DeltaTime, targetRotationYaw);
+		if (isDoorOpen)
+		{
+			audioComponent->Play();
+			isDoorOpen = false;
+		}
 	}
 	else
 	{
 		if (currentWorldTime - doorLastOpend > doorClosedDelay)
+		{
+			if (!audioComponent)
+				return;
 			DoorMecanic(DeltaTime, initialYaw);
+			if (!isDoorOpen)
+			{
+				audioComponent->Play();
+				isDoorOpen = true;
+			}
+		}
 	}
 }
 
@@ -50,6 +67,7 @@ void URoomDoor::DoorMecanic(float DeltaTime, float rotateTo)
 	doorRotation.Yaw = currentRotationYaw;
 	GetOwner()->SetActorRotation(doorRotation);
 }
+
 float URoomDoor::TotalMassOfActors()
 {
 	if (!doorPlate)
@@ -63,4 +81,11 @@ float URoomDoor::TotalMassOfActors()
 	}
 
 	return totalActorsMass;
+}
+
+void URoomDoor::GetAudioComponent()
+{
+	audioComponent = GetOwner()->FindComponentByClass<UAudioComponent>();
+	if (!audioComponent)
+		return;
 }
