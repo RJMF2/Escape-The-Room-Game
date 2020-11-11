@@ -28,6 +28,8 @@ private:
 	UPhysicsHandleComponent *physicsHandle = nullptr;
 	UInputComponent *inputComponent = nullptr;
 
+	void GetPhysicsHandle();
+	void UserInputActions();
 	void Grab();
 	void GrabUnloked();
 	FHitResult GetHitObject();

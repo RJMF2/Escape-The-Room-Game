@@ -13,24 +13,24 @@ UGrabber::UGrabber()
 void UGrabber::BeginPlay()
 {
 	Super::BeginPlay();
+	GetPhysicsHandle();
+	UserInputActions();
+}
+
+void UGrabber::UserInputActions()
+{
+	inputComponent = GetOwner()->FindComponentByClass<UInputComponent>();
+	inputComponent->BindAction("Grab", IE_Pressed, this, &UGrabber::Grab);
+	inputComponent->BindAction("Grab", IE_Released, this, &UGrabber::GrabUnloked);
+}
+
+void UGrabber::GetPhysicsHandle()
+{
 	physicsHandle = GetOwner()->FindComponentByClass<UPhysicsHandleComponent>();
-	if (physicsHandle)
-	{
-	}
-	else
+	if (!physicsHandle)
 	{
 		UE_LOG(LogTemp, Error, TEXT("please provide the missing component in %s!"), *GetOwner()->GetName());
-	}
-
-	inputComponent = GetOwner()->FindComponentByClass<UInputComponent>();
-	if (inputComponent)
-	{
-		inputComponent->BindAction("Grab", IE_Pressed, this, &UGrabber::Grab);
-		inputComponent->BindAction("Grab", IE_Released, this, &UGrabber::GrabUnloked);
-	}
-	else
-	{
-		UE_LOG(LogTemp, Error, TEXT("it does not exsist"));
+		return;
 	}
 }
 
@@ -101,4 +101,3 @@ void UGrabber::GetPlayerViewPoint(FVector &playerLocation, FRotator &playerRotat
 		OUT playerLocation,
 		OUT playerRotation);
 }
-
